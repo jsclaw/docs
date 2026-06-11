@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>jsclaw handbook</title>
+<meta name="description" content="The jsclaw handbook: agents, sandboxing, channels, skills, commands, sessions, MCP, plugins, and the openclaw compatibility story — everything as of v0.0.18.">
+<link rel="canonical" href="https://jsclaw.dev/docs/handbook.html">
+<link rel="icon" href="https://jsclaw.dev/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --cream: #FAF9F5; --cream-2: #F0EEE6; --ink: #161614; --muted: #63615C;
+    --line: #E5E2D9; --terra: #C15F3C; --terra-soft: #F3E5DD;
+    --code-bg: #24231F; --code-text: #ECEAE2;
+    --serif: 'Newsreader', Georgia, serif;
+    --sans: 'Inter', -apple-system, sans-serif;
+    --mono: 'JetBrains Mono', Consolas, monospace;
+  }
+  body { font-family: var(--sans); background: var(--cream); color: var(--ink); line-height: 1.65; }
+  nav { display: flex; align-items: center; justify-content: space-between; max-width: 880px; margin: 0 auto; padding: 18px 24px; }
+  nav .logo { font-weight: 650; color: var(--ink); text-decoration: none; }
+  nav .logo .mark { font-family: var(--mono); color: var(--terra); font-weight: 700; }
+  nav .links a { color: var(--muted); text-decoration: none; font-size: .9rem; margin-left: 18px; }
+  main { max-width: 880px; margin: 0 auto; padding: 24px 24px 80px; }
+  h1 { font-family: var(--serif); font-size: 2.6rem; font-weight: 500; margin: 28px 0 10px; }
+  .sub { color: var(--muted); max-width: 640px; margin-bottom: 36px; }
+  h2 { font-family: var(--serif); font-size: 1.55rem; font-weight: 550; margin: 44px 0 10px; }
+  h3 { font-size: 1rem; margin: 20px 0 6px; }
+  p { margin: 10px 0; max-width: 680px; }
+  a { color: var(--terra); }
+  code { font-family: var(--mono); font-size: .86em; background: var(--cream-2); border-radius: 4px; padding: 1px 6px; }
+  pre { background: var(--code-bg); color: var(--code-text); border-radius: 10px; padding: 14px 16px; overflow-x: auto; margin: 12px 0; font-size: .84rem; line-height: 1.55; }
+  pre code { background: none; padding: 0; color: inherit; }
+  table { border-collapse: collapse; margin: 12px 0; font-size: .88rem; width: 100%; max-width: 760px; }
+  th, td { text-align: left; padding: 7px 14px 7px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; }
+  .warn { border-left: 3px solid var(--terra); background: var(--terra-soft); border-radius: 0 10px 10px 0; padding: 10px 16px; margin: 14px 0; max-width: 680px; font-size: .93rem; }
+  .toc { columns: 2; max-width: 680px; font-size: .92rem; margin: 0 0 8px; }
+  .toc a { display: block; padding: 2px 0; text-decoration: none; }
+  footer { border-top: 1px solid var(--line); margin-top: 60px; }
+  footer .inner { max-width: 880px; margin: 0 auto; padding: 24px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; color: var(--muted); font-size: .85rem; }
+  footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="https://jsclaw.dev/"><span class="mark">&gt;_</span> jsclaw</a>
+  <span class="links">
+    <a href="index.html">Getting started</a>
+    <a href="https://jsclaw.dev/agent-micro/">agent-micro</a>
+    <a href="https://github.com/jsclaw/jsclaw">GitHub</a>
+  </span>
+</nav>
+<main>
+  <h1>The handbook</h1>
+  <p class="sub">Everything jsclaw does, compactly, as of <strong>v0.0.18</strong>. Start with <a href="index.html">getting started</a> if you haven't run a gateway yet. Every feature below is tested and was verified against a live instance.</p>
+
+  <div class="toc">
+    <a href="#agents">Agents &amp; identity</a>
+    <a href="#ladder">The autonomy ladder</a>
+    <a href="#sandboxing">Sandboxing</a>
+    <a href="#channels">Channels</a>
+    <a href="#skills">Skills</a>
+    <a href="#commands">Slash commands</a>
+    <a href="#sessions">Sessions</a>
+    <a href="#mcp">MCP, both directions</a>
+    <a href="#plugins">Plugins</a>
+    <a href="#openclaw">openclaw compatibility</a>
+    <a href="#agent-micro">agent-micro</a>
+    <a href="#operations">Operations notes</a>
+  </div>
+
+  <h2 id="agents">Agents &amp; identity</h2>
+  <p>One agent = one folder under <code>agents/&lt;id&gt;/</code>. The folder is the agent's whole universe:</p>
+  <table>
+    <tr><th>Path</th><th>Purpose</th></tr>
+    <tr><td><code>SOUL.md</code>, <code>IDENTITY.md</code>, <code>AGENTS.md</code>, <code>TOOLS.md</code>, <code>USER.md</code></td><td>Loaded into the system prompt in that order — openclaw's convention</td></tr>
+    <tr><td><code>HEARTBEAT.md</code></td><td>Standing orders for periodic autonomous wake-ups (reply <code>HEARTBEAT_OK</code> when idle)</td></tr>
+    <tr><td><code>memory/*.md</code></td><td>Persistent memory the agent reads and writes with file tools</td></tr>
+    <tr><td><em>everything else</em></td><td>The workspace — the only thing a sandboxed agent can see</td></tr>
+  </table>
+  <p>Lineage: <strong>openclaw</strong> is the full platform, <strong>nanoclaw</strong> the secure WhatsApp assistant it inspired, <strong>jsclaw</strong> the engine underneath — deliberately reusing openclaw's shapes (identity files, wire protocol, config vocabulary) so the ecosystems interoperate.</p>
+
+  <h2 id="ladder">The autonomy ladder</h2>
+  <table>
+    <tr><th>Rung</th><th>jsclaw surface</th></tr>
+    <tr><td>1 Chatbot</td><td>webchat / <code>chat.send</code></td></tr>
+    <tr><td>2 Copilot</td><td>agent workspace + file tools</td></tr>
+    <tr><td>3 Agent</td><td>the tool loop (bash, files, IPC)</td></tr>
+    <tr><td>4 Autopilot</td><td>headless runs, <code>jsclaw run</code></td></tr>
+    <tr><td>5 Workflows</td><td>task scheduler: cron, interval, one-shot</td></tr>
+    <tr><td>6 Assistant</td><td>heartbeat — drop a <code>HEARTBEAT.md</code> in the agent folder</td></tr>
+    <tr><td>7 Multi-agent</td><td>agents are addressable everywhere; bindings route channels/peers to agents</td></tr>
+    <tr><td>8 Orchestrator</td><td>one jsclaw calling another's MCP <code>messages_send</code> is sub-agency (formal spawn tool: open)</td></tr>
+  </table>
+
+  <h2 id="sandboxing">Sandboxing</h2>
+  <pre><code>{ "sandboxMode": "non-main", "localRunner": "/path/to/agent-micro/runner.js" }</code></pre>
+  <table>
+    <tr><th>Mode</th><th>Behavior</th></tr>
+    <tr><td><code>auto</code> (default)</td><td>Containers when the engine responds; plain processes otherwise</td></tr>
+    <tr><td><code>all</code></td><td>Every agent in a container — nanoclaw's posture, safest</td></tr>
+    <tr><td><code>non-main</code></td><td>Main agent on the host, others contained</td></tr>
+    <tr><td><code>off</code></td><td>Every agent as a plain process — openclaw's posture</td></tr>
+  </table>
+  <p>Per-agent override: <code>sandbox: true/false</code> on the agent config. Unsandboxed agents are spawned from <code>localRunner</code> with the workspace and IPC dirs as env vars.</p>
+  <div class="warn"><strong>Unsandboxed agents have no isolation.</strong> Their bash and file tools run as <em>you</em>. The agent folder is a security boundary only when there's a container around it. Keep autonomous agents and anything touching untrusted input sandboxed.</div>
+
+  <h2 id="channels">Channels</h2>
+  <p>The gateway hosts chat surfaces from config — channel blocks share openclaw's universal fields (<code>allowFrom</code>, <code>dmPolicy</code>, <code>enabled</code>); routing to agents lives in <code>bindings</code>, never in the channel:</p>
+  <pre><code>{
+  "channels": {
+    "nostr":    { "privateKey": "${NOSTR_PRIVATE_KEY}", "allowFrom": ["npub1...you"],
+                  "relays": ["wss://relay.damus.io", "wss://nos.lol"] },
+    "telegram": { "botToken": "${TELEGRAM_BOT_TOKEN}", "allowFrom": ["123456789", "@you"] }
+  },
+  "bindings": [{ "match": { "channel": "nostr" }, "agentId": "research" }]
+}</code></pre>
+  <p>Nostr is built in and zero-dep (NIP-04 encrypted DMs — message the npub from the boot banner; no platform, no bot token). Telegram uses grammy (jsclaw's one dependency). <code>allowFrom</code> is required: an open DM agent answers anyone and burns tokens (<code>dmPolicy: "open"</code> + <code>allowFrom: ["*"]</code> to accept that). One session per (channel, peer).</p>
+
+  <h2 id="skills">Skills</h2>
+  <p>openclaw / Anthropic <code>SKILL.md</code> format — folders with resources, or flat files. Install from a path: <code>jsclaw skill install ./my-skill</code>.</p>
+  <table>
+    <tr><th>Frontmatter</th><th>Surfacing</th></tr>
+    <tr><td><em>no trigger</em> (the upstream norm)</td><td><strong>Description-driven</strong>: the agent sees a compact index (name + description + path) and reads the body on demand — 58 installed skills cost index lines, not 58 bodies per prompt</td></tr>
+    <tr><td><code>trigger: "deploy|/regex/i|attachment:image"</code></td><td>jsclaw extension: host-side match injects the body into that prompt</td></tr>
+    <tr><td><code>user-invocable: true</code></td><td>Also becomes <code>/skillname</code> — force-injects the body with your arguments</td></tr>
+  </table>
+  <p>Sandboxed agents get the skills dir as a read-only mount; paths in the index always resolve from inside the run. Real openclaw skills parse 58/58; their <code>metadata.openclaw.requires</code> (binary deps) is not yet honored — pure-knowledge skills work fully today.</p>
+
+  <h2 id="commands">Slash commands</h2>
+  <p>Host-handled before the agent sees the message — deterministic, instant, zero tokens, identical on webchat, TUI, Nostr, and Telegram: <code>/reset</code> (+<code>/new</code>), <code>/status</code>, <code>/skills</code>, <code>/help</code> (+<code>/commands</code>), plus user-invocable skills and plugin commands. <code>commands.list</code> serves openclaw-shaped entries so their clients render them. Unknown commands answer with <code>/help</code> guidance instead of reaching the agent.</p>
+
+  <h2 id="sessions">Sessions</h2>
+  <p>openclaw's two-layer model: a persistent index (<code>data/sessions.json</code>: key → <code>{sessionId, agentId, label?, model?, updatedAt}</code>) over the runners' transcript files. Keys: <code>main</code> (webchat/TUI default), <code>&lt;channel&gt;:&lt;peer&gt;</code>. Sessions survive gateway restarts; <code>/reset</code> mints a fresh conversation under the same key.</p>
+  <p>Wire methods: <code>sessions.list</code>, <code>sessions.reset</code> (<code>reason: "reset"|"new"</code>), <code>sessions.patch</code> (<code>label</code>, <code>model</code> — null clears). A patched <code>model</code> flows into runs: switch one conversation to a cheaper model without touching config.</p>
+
+  <h2 id="mcp">MCP, both directions</h2>
+  <h3>The gateway is an MCP server</h3>
+  <p><code>POST /mcp</code> — JSON-RPC 2.0, Streamable HTTP (2025-03-26), stateless, auth via <code>Authorization: Bearer &lt;gateway token&gt;</code>. Tools speak openclaw's bridge vocabulary: <code>conversations_list</code>, <code>messages_send</code> (send into a session key, get the reply), <code>messages_read</code>, <code>agents_list</code>, <code>skills_list</code>. Point Claude Desktop, Claude Code, or any MCP host at it and your agents become tools.</p>
+  <h3>Agents are MCP clients</h3>
+  <p>agent-micro connects to HTTP MCP servers from config; discovered tools join the loop as <code>mcp__&lt;server&gt;__&lt;tool&gt;</code>:</p>
+  <pre><code>{ "mcp": { "servers": {
+  "pod": { "url": "https://your-jss/mcp", "headers": { "authorization": "Bearer ..." } }
+} } }</code></pre>
+  <p>Division of labor: <strong>plugins extend the gateway; MCP extends the agent.</strong> The default (Claude Code) runner brings its own MCP client; the same config passes through.</p>
+
+  <h2 id="plugins">Plugins</h2>
+  <p>A plugin is a directory with <code>jsclaw.plugin.json</code> (<code>{id, version, entry}</code>) whose entry exports <code>activate(api)</code>. The api registers into the four host seams: <code>registerChannel</code>, <code>registerCommand</code>, <code>registerGatewayMethod</code>, <code>registerMcpTool</code>. Failing plugins warn and skip.</p>
+  <pre><code>{ "plugins": {
+  "load": { "paths": ["./my-plugin"] },
+  "deny": [], "allow": null,
+  "entries": { "my-plugin": { "enabled": true, "config": { "key": "value" } } }
+} }</code></pre>
+  <p>Policy is openclaw's: deny &gt; allow &gt; per-entry enabled. See <code>examples/plugins/ping</code> for the full contract in 25 lines.</p>
+
+  <h2 id="openclaw">openclaw compatibility</h2>
+  <table>
+    <tr><th>Surface</th><th>Status</th></tr>
+    <tr><td>Wire frames (<code>req</code>/<code>res</code>/<code>event</code>), connect handshake</td><td>✅ <code>openclaw tui</code> connects to a jsclaw gateway</td></tr>
+    <tr><td><code>chat.send</code> / <code>chat.history</code> / chat events</td><td>✅ sessionKey addressing, openclaw event shapes</td></tr>
+    <tr><td><code>sessions.list/reset/patch</code></td><td>✅ (patch: label + model; exotic fields stubbed)</td></tr>
+    <tr><td><code>commands.list</code>, <code>agents.list</code>, <code>models.list</code></td><td>✅ real entries (models: configured model only)</td></tr>
+    <tr><td>Channel config vocabulary, bindings, SKILL.md, MCP bridge tools, plugin config shape</td><td>✅ field-for-field where concepts map</td></tr>
+    <tr><td><code>chat.abort</code>, devices/pairing, nodes, voice, canvas</td><td>✗ stubbed or not attempted</td></tr>
+  </table>
+
+  <h2 id="agent-micro">agent-micro</h2>
+  <p><a href="https://jsclaw.dev/agent-micro/">The readable runner</a>: ~1,000 lines, zero dependencies, AGPL, Anthropic-compatible API over fetch (works with GLM and Kimi). Speaks the full container contract — stdin <code>ContainerInput</code>, sentinel-delimited stdout, identity files, memory, IPC tools, sessions, token usage, the skills index, and the MCP client. Use it sandboxed as the container image, or unsandboxed via <code>localRunner</code> for a no-Docker host.</p>
+
+  <h2 id="operations">Operations notes</h2>
+  <table>
+    <tr><th>Observation</th><th>What it means</th></tr>
+    <tr><td>"in" tokens dwarf your words</td><td>Every turn carries the harness: tool definitions, identity, memory, skills index. The webchat shows per-reply and session totals — watch them.</td></tr>
+    <tr><td>Sessions grow</td><td>History rides every turn. <code>/reset</code> is the valve — it works on every surface.</td></tr>
+    <tr><td>Cheap heartbeats</td><td>Set <code>heartbeatModel</code> to a small model: ~48 cycles/day is the biggest cost lever.</td></tr>
+    <tr><td>Allowlists are not optional</td><td>An open DM agent answers anyone and burns tokens. Channel config refuses to start without <code>allowFrom</code> unless you double opt in.</td></tr>
+    <tr><td>Unsandboxed + autonomous + untrusted input</td><td>Pick two. Exec approvals are on the roadmap; until then, that combination is yours to avoid.</td></tr>
+  </table>
+</main>
+<footer><div class="inner">
+  <span>© 2026 jsclaw · <a href="https://github.com/jsclaw/docs/blob/gh-pages/LICENSE">AGPL-3.0 License</a></span>
+  <span><a href="index.html">getting started</a> · <a href="https://github.com/jsclaw/docs">improve these docs</a></span>
+</div></footer>
+</body>
+</html>
