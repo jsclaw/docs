@@ -94,7 +94,7 @@
   <pre><code>npm install jsclaw</code></pre>
 
   <h2><span class="n">2</span>Onboard</h2>
-  <p>The wizard checks your environment, walks you through provider and model selection, scaffolds your first agent group, and writes <code>jsclaw.json</code>:</p>
+  <p>The wizard checks your environment, walks you through provider and model selection, scaffolds your first agent, and writes <code>jsclaw.json</code>:</p>
   <pre><code>npx jsclaw onboard</code></pre>
   <p>Providers supported out of the box: Anthropic (direct), GLM (Z.ai), Kimi (Moonshot), AWS Bedrock, Google Vertex, or any Anthropic-compatible endpoint. Secrets are stored as <code>${ENV_VAR}</code> references, never literals.</p>
 
@@ -121,12 +121,12 @@ npx jsclaw gateway</code></pre>
   <p>Open the printed <code>http://127.0.0.1:18789/chat?token=…</code> URL and say hello. The gateway wires everything: task scheduler, heartbeat, IPC watcher, and a WebSocket API.</p>
 
   <h2><span class="n">5</span>Make it yours</h2>
-  <p>Your agent's personality and standing instructions live as plain markdown in the group folder:</p>
+  <p>Your agent's personality and standing instructions live as plain markdown in the agent folder:</p>
   <table>
     <tr><th>File</th><th>Purpose</th></tr>
-    <tr><td><code>groups/main/SOUL.md</code></td><td>Who the agent is — loaded into every system prompt</td></tr>
-    <tr><td><code>groups/main/HEARTBEAT.md</code></td><td>What to do when woken periodically</td></tr>
-    <tr><td><code>groups/main/memory/*.md</code></td><td>Persistent memory the agent reads and writes</td></tr>
+    <tr><td><code>agents/main/SOUL.md</code></td><td>Who the agent is — loaded into every system prompt</td></tr>
+    <tr><td><code>agents/main/HEARTBEAT.md</code></td><td>What to do when woken periodically</td></tr>
+    <tr><td><code>agents/main/memory/*.md</code></td><td>Persistent memory the agent reads and writes</td></tr>
   </table>
   <p>From there: schedule tasks with cron, add skills (<code>SKILL.md</code>), wire MCP servers, or route channels like Nostr. The <a href="https://github.com/jsclaw/jsclaw#readme">README</a> covers the full API.</p>
 
