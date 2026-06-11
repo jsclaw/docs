@@ -113,7 +113,7 @@ docker build -t jsclaw-agent:latest -f node_modules/jsclaw/container/Dockerfile 
 git clone https://github.com/jsclaw/agent-micro && cd agent-micro
 docker build -t jsclaw-agent-micro:latest -f container/Dockerfile .
 npx jsclaw config set containerImage jsclaw-agent-micro:latest</code></pre>
-  <div class="callout">No Docker? Set <code>"containerRuntime": "local"</code> and point <code>localRunner</code> at agent-microNo Docker? agent-micro also runs standalone as a plain node process — see its <a href="https://github.com/jsclaw/agent-micro#usage">README</a> for the stdin/stdout contract.#x27;s <code>runner.js</code> — the agent runs as a plain node process. No isolation: the agent acts as your user, so trusted workloads only.</div>
+  <div class="callout">No Docker? Set <code>"sandboxMode": "off"</code> and point <code>localRunner</code> at agent-microNo Docker? agent-micro also runs standalone as a plain node process — see its <a href="https://github.com/jsclaw/agent-micro#usage">README</a> for the stdin/stdout contract.#x27;s <code>runner.js</code> — the agent runs as a plain node process. No isolation: the agent acts as your user, so trusted workloads only.</div>
 
   <h2><span class="n">4</span>Run the gateway</h2>
   <pre><code>export ANTHROPIC_API_KEY=sk-ant-...   <span class="c"># or your provider's key from step 2</span>
